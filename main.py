@@ -27,7 +27,6 @@ def validate_data(data):
             return False
     return True
 
-# Charger les données à partir d'un fichier JSON
 data = load_data('medical_data.json')
 if data is None:
     exit(1)
@@ -35,7 +34,6 @@ if data is None:
 if not validate_data(data):
     exit(1)
 
-# Formater les données
 def format_example(example):
     text = f"Instruction: {example['instruction']}\nInput: {example['input']}\nOutput: {example['output']}"
     return {'text': text}
@@ -48,13 +46,11 @@ tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
 tokenizer.add_special_tokens({'pad_token': '[PAD]'})
 model = GPT2LMHeadModel.from_pretrained('gpt2')
 
-# Tokeniser les données
 def tokenize_function(examples):
     return tokenizer(examples['text'], truncation=True, padding="max_length", max_length=512)
 
 tokenized_datasets = dataset.map(tokenize_function, batched=True)
 
-# Configurer l'entraînement
 training_args = TrainingArguments(
     output_dir='./results',
     num_train_epochs=3,
@@ -72,14 +68,11 @@ trainer = Trainer(
     train_dataset=tokenized_datasets,
 )
 
-# Entraîner le modèle
 trainer.train()
 
-# Sauvegarder le modèle
 model.save_pretrained('./medical_gpt')
 tokenizer.save_pretrained('./medical_gpt')
 
-# Fonction pour générer des réponses
 def generate_response(instruction, input_text):
     prompt = f"Instruction: {instruction}\nInput: {input_text}\nOutput:"
     inputs = tokenizer(prompt, return_tensors="pt", truncation=True, max_length=512)
@@ -89,7 +82,6 @@ def generate_response(instruction, input_text):
     response = response.split("Output:")[1].strip()
     return response
 
-# Exemple d'utilisation
 instruction = "If you are a doctor, please answer the medical questions based on the patient's description."
 input_text = "I woke up this morning feeling the whole room is spinning when i was sitting down..."
 print(generate_response(instruction, input_text))

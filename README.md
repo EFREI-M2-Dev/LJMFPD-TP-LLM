@@ -23,7 +23,7 @@ The training data follows this structured format:
 
 ### Installation
 ```bash
-pip install transformers datasets torch
+pip install transformers datasets
 ```
 
 ### Key Components
